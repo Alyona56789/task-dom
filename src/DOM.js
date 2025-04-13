@@ -1,29 +1,59 @@
-/*
-  В функцию appendToBody передаются 3 параметра:
-  tag - имя тега, content - содержимое тега и count - количество вставок.
-  Необходимо, чтобы функция осуществила вставку на страницу указанный тег с указанным содержимым указанное число раз.
-  Считаем, что всегда передается тег, допускающий вставку текста в качестве своего содержимого (P, DIV, I и пр.).
-*/
+/**
+ * Вставляет на страницу указанный тег с указанным содержимым указанное число раз.
+ * @param {string} tag Имя тега.
+ * @param {string} content Содержимое тега.
+ * @param {number} count Количество вставок.
+ */
 export function appendToBody(tag, content, count) {
+    for (let i = 0; i < count; i++) {
+        const element = document.createElement(tag);
+        element.textContent = content;
+        document.body.appendChild(element);
+    }
 }
 
-/*
-  Создайте дерево вложенных тегов DIV.
-  Каждый узел дерева должен содержать childrenCount узлов.
-  Глубина дерева задается параметром level.
-  Каждый элемент должен иметь класс вида item_n, где n - глубина вложенности элемента. (Нумерацию ведем с единицы).
-  Сформированное дерево верните в качестве результата работы функции.
-*/
+/**
+ * Создаёт дерево вложенных тегов DIV.
+ * Каждый узел дерева содержит childrenCount узлов.
+ * Глубина дерева задается параметром level.
+ * Каждый элемент имеет класс вида item_n, где n - глубина вложенности элемента.
+ * @param {number} childrenCount Количество детей у каждого узла.
+ * @param {number} level Глубина дерева.
+ * @returns {HTMLElement} Корневой элемент дерева.
+ */
 export function generateTree(childrenCount, level) {
+    function createLevel(currentLevel) {
+        const parent = document.createElement('div');
+        parent.className = `item_${currentLevel}`;
+
+        if (currentLevel < level) {
+            for (let i = 0; i < childrenCount; i++) {
+                parent.appendChild(createLevel(currentLevel + 1));
+            }
+        }
+
+        return parent;
+    }
+
+    return createLevel(1);
 }
 
-/*
-  Используйте функцию для создания дерева тегов DIV из предыдущего задания.
-  Создайте дерево с вложенностью 3 и числом элементов в каждом узле 2.
-  Далее замените все узлы второго уровня (т.е. имеющие класс item_2) на теги SECTION.
-  Остальную структуру дерева сохраните неизменной, включая классы и те элементы,
-  которые находились внутри переписанных тегов.
-  Сформированное дерево верните в качестве результата работы функции.
-*/
+/**
+ * Создаёт дерево тегов DIV с вложенностью 3 и числом элементов в каждом узле 2,
+ * затем заменяет все узлы второго уровня на теги SECTION.
+ * @returns {HTMLElement} Корневой элемент дерева.
+ */
 export function replaceNodes() {
+    const tree = generateTree(2, 3);
+
+    // Поиск и замена узлов второго уровня
+    const level2Nodes = tree.querySelectorAll('.item_2');
+    level2Nodes.forEach((node) => {
+        const section = document.createElement('section');
+        section.className = node.className;
+        section.innerHTML = node.innerHTML;
+        node.replaceWith(section);
+    });
+
+    return tree;
 }
